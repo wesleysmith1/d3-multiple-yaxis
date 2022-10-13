@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<head>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+	<style>
+
+        .bar {
+            fill: steelblue;
+        }
+
+        .bar2 {
+            fill: red;
+        }
+
+        .axisRed line{
+            stroke: red;
+        }
+
+        .axisRed path{
+            stroke: red;
+        }
+
+        .axisRed text{
+            fill: red;
+        }
+
+        g {
+            font-size: 16px;
+        }
+
+	</style>
+</head>
+
+<body>
+
+<svg width="600" height="500"></svg>
+	
+<script>
+
+var svg = d3.select("svg"),
+        margin = 200,
+        width = svg.attr("width") - margin,
+        height = svg.attr("height") - margin
+
+svg.append("text")
+    .attr("transform", "translate(100,0)")
+    .attr("x", 100)
+    .attr("y", 50)
+    .attr("font-size", "24px")
+    .text("Multi Axis Bar Chart")
+
+var xScale = d3.scaleBand().range([0, width]).padding(0.4),
+    yScale = d3.scaleLinear().range([0, height]),
+    yScale2 = d3.scaleLinear().range([0, height])
+
+var g = svg.append("g")
+            .attr("transform", "translate(" + 100 + "," + 100 + ")");
+
+xScale.domain([2011, 2012, 2013, 2014, 2015, 2016]);
+yScale.domain([100, 0]);
+yScale2.domain([1000, 0]);
+
+g.append("g")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(xScale))
+
+g.append("g")
+    .call(d3.axisLeft(yScale)
+    .ticks(10))
+    .append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("dy", "-3em")
+    .attr("dx", "-7em")
+    .attr("stroke", "black")
+    .attr("fill", "black")
+    .text("First Axis");
+
+g.append("g")
+    .call(d3.axisRight(yScale2).tickFormat(function(d){
+        return d;
+    }))
+    .attr("transform", "translate(" + width + " ,0)")
+    .attr("class", "axisRed")
+    .append("text")
+    .attr("transform", "rotate(90)")
+    .attr("dx", "6em")
+    .attr("dy", "-3.1em")
+    .attr("stroke", "red")
+    .text("Second Axis")
+    .attr("color", "red");
+
+let data = [
+    {d:10, y:2011, scale:yScale, class: 'bar'},
+    {d:60, y:2012, scale:yScale, class: 'bar'},
+    {d:50, y:2013, scale:yScale, class: 'bar'},
+    {d:64, y:2014, scale:yScale, class: 'bar'},
+    {d:80, y:2015, scale:yScale, class: 'bar'},
+    {d:999, y:'2016', scale:yScale2, class: 'bar2'},
+]
+
+let bars = g.selectAll(".bar")
+    .data(data)
+    .enter().append("g")
+
+bars.append("rect").attr("class", function(d) { return d.class })
+    .attr("x", function(d) { return xScale(d.y); })
+    .attr("y", function(d) { return d.scale(d.d); })
+    .attr("width", xScale.bandwidth())
+    .attr("height", function(d) { return height - d.scale(d.d); })
+
+bars.append("text")
+    .text(function(d) {return d.d})
+    .attr("x", function(d) { return xScale(d.y); })
+    .attr("y", function(d) { return d.scale(d.d); })
+
+</script>
+
+</body>
